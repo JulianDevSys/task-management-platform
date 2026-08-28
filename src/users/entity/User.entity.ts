@@ -3,9 +3,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { UserRole } from '../enums/user-role.enum';
+import { Organization } from 'src/organizations/entity/Organization.entity';
+import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -24,6 +28,9 @@ export class User {
   @Column({ name: 'avatar_url', type: 'varchar', length: 500, nullable: true })
   avatarUrl: string | null;
 
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.MEMBER })
+  role: UserRole;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -32,4 +39,10 @@ export class User {
 
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
+
+  @OneToMany(() => Organization, (organizations) => organizations.creator)
+  organizations: Organization[];
+
+  @OneToMany(() => MembersOrganization, (memberShip) => memberShip.userMember)
+  memberShip: MembersOrganization[];
 }
