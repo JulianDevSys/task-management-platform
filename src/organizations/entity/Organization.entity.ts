@@ -37,7 +37,7 @@ export class Organization {
 
   @OneToMany(
     () => MembersOrganization,
-    (Membership ) => Membership.organization
+    (Membership ) => Membership.organization, {cascade: true, onDelete: 'CASCADE'}// si borro la organization automaticamente se borran los miembros de la organizacion
   )
   Membership : MembersOrganization[];
 }

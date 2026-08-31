@@ -14,7 +14,7 @@ export class GetOrganizationService{
 
   async findAllOrganization (){
     const existOrganization= await this.organizationRepo.find({
-      relations: { creator: true}
+      relations: { creator: true} // asi ponemos la relacion con quien la cree
     })
 
     return  existOrganization.map(org=>({

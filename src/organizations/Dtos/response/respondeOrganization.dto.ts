@@ -10,9 +10,6 @@ export class OrganizationResponseDto {
   @ApiProperty()
   description?: string;
 
-/*   @ApiProperty()
-  creatorId: string;
- */
   @ApiProperty()
   creatorName: string;
 
