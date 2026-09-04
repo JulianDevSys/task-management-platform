@@ -58,11 +58,11 @@ export class CreateTaskService {
     //////////////////////////////////////////////////////////////////////////
 
     let assignedTo: MembersOrganization | null = null;
-  
+
     if (assignedToId) {
       assignedTo = await this.memberOrganizationRepository.findOne({
         where: {
-          id: assignedToId,
+          userMember: { id: assignedToId },
           organization: {
             id: organizationId,
           },
@@ -77,7 +77,9 @@ export class CreateTaskService {
     }
     ////////////////////////////////////////////////////////////////////////
 
-    const task = await this.taskRepository.findOne({ where: { title , organization: { id: organizationId } } });
+    const task = await this.taskRepository.findOne({
+      where: { title, organization: { id: organizationId } },
+    });
     if (task) {
       throw new NotFoundException('task already exists');
     }
@@ -89,18 +91,21 @@ export class CreateTaskService {
       priority: priority,
       dueDate,
       organization,
-      assignedTo ,
-      assignedBy: memberAssignedBy
+      assignedTo,
+      assignedBy: memberAssignedBy,
     });
 
     await this.taskRepository.save(newTask);
 
     const returnResponse = await this.taskRepository.findOne({
       where: { id: newTask.id },
-      relations: { organization: true, assignedTo: { userMember: true }, assignedBy: { userMember: true } },
+      relations: {
+        organization: true,
+        assignedTo: { userMember: true },
+        assignedBy: { userMember: true },
+      },
     });
 
-    console.log('returnResponse:', returnResponse?.assignedBy);
     return {
       id: newTask.id,
       title: newTask.title,
