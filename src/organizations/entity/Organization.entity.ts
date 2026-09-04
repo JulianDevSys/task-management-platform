@@ -1,4 +1,5 @@
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
+import { Tasks } from 'src/task/entity/task.entity';
 import { User } from 'src/users/entity/User.entity';
 import {
   Column,
@@ -34,10 +35,12 @@ export class Organization {
   @ManyToOne(() => User, (creator) => creator.organizations)
   creator: User;
   
-
   @OneToMany(
     () => MembersOrganization,
     (Membership ) => Membership.organization, {cascade: true, onDelete: 'CASCADE'}// si borro la organization automaticamente se borran los miembros de la organizacion
   )
   Membership : MembersOrganization[];
+
+  @OneToMany(() => Tasks, (task) => task.organization,)
+  tasks: Tasks[]; 
 }
