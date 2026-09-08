@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { MemberRole } from '../enum/memberRole.enum';
 import { Tasks } from 'src/task/entity/task.entity';
+import { Invitation } from 'src/invitation/entity/invitation.entity';
 
 @Entity('member_organization')
 export class MembersOrganization {
@@ -28,10 +29,12 @@ export class MembersOrganization {
   )
   organization: Organization;
 
-
   @OneToMany(() => Tasks, (task) => task.assignedTo)
   taskAssigned: Tasks[];
 
   @OneToMany(() => Tasks, (task) => task.assignedBy)
   taskAssignedBy: Tasks[];
+
+/*   @OneToMany(()=>Invitation, (invitation)=> invitation.sendInvitation)
+  sendInvitation: Invitation[] */
 }
