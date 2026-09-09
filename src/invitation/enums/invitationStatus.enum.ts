@@ -1,0 +1,8 @@
+
+export enum InvitationStatus {
+  PENDING = 'PENDING',
+  REQUESTED = 'REQUESTED',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  EXPIRED = 'EXPIRED',
+}
