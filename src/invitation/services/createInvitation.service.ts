@@ -12,9 +12,9 @@ import { Organization } from 'src/organizations/entity/Organization.entity';
 import { User } from 'src/users/entity/User.entity';
 import { CreateInvitationDto } from '../Dtos/createInvitation.dto';
 import { MemberRole } from 'src/memberOrganization/enum/memberRole.enum';
-import { InvitationStatus } from '../enums/invitationStatus.dto';
+import { InvitationStatus } from '../enums/invitationStatus.enum';
 import { InvitationResponseDto } from '../Dtos/response/InvitationResponse.dto';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings.js';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CreateInvitationService {
@@ -27,7 +27,8 @@ export class CreateInvitationService {
     @InjectRepository(Organization)
     private readonly organizationRepo: Repository<Organization>,
     @InjectRepository(User)
-    private readonly userRepo: Repository<User>
+    private readonly userRepo: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
 
   async createInvitation(
@@ -86,10 +87,17 @@ export class CreateInvitationService {
     );
   }
 
+  const expirationDays =
+  this.configService.get<number>('INVITATION_EXPIRATION_DAYS') || 7;
+
+  const expiresAt = new Date();
+expiresAt.setDate(expiresAt.getDate() + expirationDays);
+
   const invitation = this.invitationRepo.create({
     organization,
     receiverUser,
     sendInvitation: { id: senderUserId } as User,
+    expiresAt,
   });
 
   const savedInvitation = await this.invitationRepo.save(invitation);

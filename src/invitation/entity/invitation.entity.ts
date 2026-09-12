@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { InvitationStatus } from '../enums/invitationStatus.dto';
+import { InvitationStatus } from '../enums/invitationStatus.enum';
 import { Organization } from 'src/organizations/entity/Organization.entity';
 import { User } from 'src/users/entity/User.entity';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
@@ -24,10 +24,10 @@ export class Invitation {
   })
   status: InvitationStatus;
 
-  @CreateDateColumn({nullable:true})
+  @CreateDateColumn({ nullable: true })
   createdAt: Date;
 
-  @UpdateDateColumn({nullable:true})
+  @UpdateDateColumn({ nullable: true })
   updatedAt: Date;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -41,12 +41,7 @@ export class Invitation {
   @JoinColumn({ name: 'receiverUserId' })
   receiverUser: User;
 
-
   @ManyToOne(() => User, (user) => user.sendInvitations)
   @JoinColumn({ name: 'sendInvitationId' })
   sendInvitation: User;
-
-/*   @ManyToOne(()=>MembersOrganization, (member)=> member.sendInvitation)
-  @JoinColumn({ name: 'sendInvitationId' })
-  sendInvitation: MembersOrganization; */
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { InvitationStatus } from 'src/invitation/enums/invitationStatus.dto';
+import { InvitationStatus } from 'src/invitation/enums/invitationStatus.enum';
 
 export class InvitationResponseDto  {
   @ApiProperty({ description: 'Unique ID of the invitation' })

@@ -14,6 +14,16 @@ import { AcceptInvitationController } from './controllers/acceptInvitation.contr
 import { AcceptInvitationService } from './services/acceptInvitation.service';
 import { RejectInvitationService } from './services/rejectInvitation.service';
 import { RejectInvitationController } from './controllers/rejectInvitation.controller';
+import { ExpireInvitationService } from './services/expireInvitation.service';
+import { ExpireInvitationController } from './controllers/expireInvitation.controller';
+import { AcceptJoinRequestController } from './controllers/acceptJoinRequest.controller';
+import { RejectJoinRequestController } from './controllers/rejectJoinRequest.controller';
+import { CreateJoinRequestController } from './controllers/createJoinReques.controller';
+import { RejectJoinRequestService } from './services/rejectJoinRequest.service';
+import { CreateJoinRequestService } from './services/createJoinRequest.service';
+import { AcceptJoinRequestService } from './services/aceptJoinRequest.service';
+import { advancedInvitationsQueryController } from './controllers/advancedInvitationsQuery.controller';
+import { AdvancedInvitationsQueryService } from './services/advancedInvitationsQuery.service';
 
 @Module({
   imports: [
@@ -24,7 +34,29 @@ import { RejectInvitationController } from './controllers/rejectInvitation.contr
       Organization,
     ]),
   ],
-  controllers: [CreateInvitationController, DeleteInvitationController, GetInvitationByOrganizationController, AcceptInvitationController,RejectInvitationController],
-  providers: [CreateInvitationService, DeleteInvitationService, GetInvitationByOrganizationService,AcceptInvitationService, RejectInvitationService],
+  controllers: [
+    CreateInvitationController,
+    DeleteInvitationController,
+    GetInvitationByOrganizationController,
+    AcceptInvitationController,
+    RejectInvitationController,
+    ExpireInvitationController,
+    AcceptJoinRequestController,
+    RejectJoinRequestController,
+    CreateJoinRequestController,
+    advancedInvitationsQueryController
+  ],
+  providers: [
+    CreateInvitationService,
+    DeleteInvitationService,
+    GetInvitationByOrganizationService,
+    AcceptInvitationService,
+    RejectInvitationService,
+    ExpireInvitationService,
+    AcceptJoinRequestService,
+    RejectJoinRequestService,
+    CreateJoinRequestService,
+    AdvancedInvitationsQueryService
+  ],
 })
 export class InvitationModule {}
