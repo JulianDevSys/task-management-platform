@@ -13,18 +13,20 @@
 
 ## 🚀 Overview
 This project is a **backend platform inspired by Jira**, designed to manage tasks, organizations, and users with role‑based access control (RBAC).  
-It implements **authentication**, **authorization**, **filters**, and **transactional operations** to ensure data consistency and scalability.
+It implements **authentication**, **authorization**, **filters**, **notifications**, and **transactional operations** to ensure data consistency and scalability.
 
 ---
 
 ## 🧠 Key Features
 - **Authentication & Authorization:** JWT + Refresh Tokens, Role‑Based Access Control (RBAC).  
 - **Organizations & Members:** Create organizations, manage memberships, and invitations.  
-- **Tasks & Comments:** CRUD operations with filters, pagination, and relational queries.  
+- **Tasks & Comments:** CRUD operations with filters, pagination, relational queries, and threaded comments.  
+- **File Management:** Upload and download files linked to tasks or organizations.  
+- **Notifications:** Real‑time notifications via WebSockets/Redis PubSub.  
 - **Security:** Guards, Interceptors, Exception Filters.  
 - **Documentation:** Swagger/OpenAPI integration.  
 - **Testing:** Jest + Supertest (unit, integration, and e2e).  
-- **Infrastructure:** Dockerized PostgreSQL, CI/CD with GitHub Actions.  
+- **Infrastructure:** Dockerized PostgreSQL + Redis, CI/CD with GitHub Actions.  
 - **Scalability:** Modular architecture following SOLID and Clean Architecture principles.
 
 ---
@@ -34,7 +36,10 @@ It implements **authentication**, **authorization**, **filters**, and **transact
 |-------|---------------|
 | **Backend Framework** | NestJS (TypeScript) |
 | **Database** | PostgreSQL + TypeORM |
+| **Cache & Pub/Sub** | Redis |
 | **Authentication** | JWT, Refresh Tokens |
+| **File Handling** | Multer / Streams |
+| **Notifications** | WebSockets + Redis |
 | **Testing** | Jest, Supertest |
 | **DevOps** | Docker, GitHub Actions, AWS |
 | **Documentation** | Swagger / OpenAPI |
