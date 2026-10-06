@@ -10,6 +10,11 @@ import {
 import { UserRole } from '../enums/user-role.enum';
 import { Organization } from 'src/organizations/entity/Organization.entity';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
+import { Invitation } from 'src/invitation/entity/invitation.entity';
+import { RefreshToken } from 'src/auth/entity/auth.entity';
+import { Comment } from 'src/comments/entity/comment.entity';
+import { Notification } from 'src/notifications/entity/notification.entity';
+
 
 @Entity({ name: 'users' })
 export class User {
@@ -28,8 +33,17 @@ export class User {
   @Column({ name: 'avatar_url', type: 'varchar', length: 500, nullable: true })
   avatarUrl: string | null;
 
+  @Column({ name: 'profile_image_key', type: 'varchar', length: 500, nullable: true })
+  profileImageKey: string | null;
+
+  @Column({ name: 'profile_image_mime_type', type: 'varchar', length: 120, nullable: true })
+  profileImageMimeType: string | null;
+
   @Column({ type: 'enum', enum: UserRole, default: UserRole.MEMBER })
   role: UserRole;
+
+  @Column({ select: false }) // evitamos devolverla
+  password:string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -45,4 +59,19 @@ export class User {
 
   @OneToMany(() => MembersOrganization, (memberShip) => memberShip.userMember)
   memberShip: MembersOrganization[];
+
+  @OneToMany(()=> Invitation, (invitation)=> invitation.receiverUser)
+  receivedInvitations: Invitation[]
+
+  @OneToMany(()=> Invitation, (invitation)=> invitation.sendInvitation)
+  sendInvitations: Invitation[]
+
+  @OneToMany(()=> RefreshToken, (token)=>token.user)
+  refreshTokens: RefreshToken[]
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
+
+  @OneToMany(() => Notification, (notification) => notification.user)
+  notifications: Notification[];
 }

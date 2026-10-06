@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from '../entity/comment.entity';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class DeleteCommentService {
@@ -11,6 +12,7 @@ export class DeleteCommentService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(MembersOrganization)
     private readonly memberOrganizationRepository: Repository<MembersOrganization>,
+    private readonly redisService: RedisService,
   ) {}
 
   async deleteComment(
@@ -41,6 +43,9 @@ export class DeleteCommentService {
       throw new ForbiddenException('You can only delete your own comments');
     }
 
+    const taskId = comment.task.id;
+
     await this.commentRepository.remove(comment);
+    await this.redisService.delete(`comments:task:${taskId}`);
   }
 }

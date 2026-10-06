@@ -17,6 +17,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
      "strictPropertyInitialization": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+     "types": ["jest"]
   }
 }

@@ -5,6 +5,7 @@ import { CreateCommentService } from '../services/create-comment.service';
 import { Comment } from '../entity/comment.entity';
 import { Tasks } from 'src/task/entity/task.entity';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
+import { RedisService } from 'src/redis/redis.service';
 
 describe('CreateCommentService', () => {
   let service: CreateCommentService;
@@ -28,6 +29,10 @@ describe('CreateCommentService', () => {
         { provide: getRepositoryToken(Comment), useValue: commentRepository },
         { provide: getRepositoryToken(Tasks), useValue: taskRepository },
         { provide: getRepositoryToken(MembersOrganization), useValue: memberRepository },
+        {
+          provide: RedisService,
+          useValue: { delete: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

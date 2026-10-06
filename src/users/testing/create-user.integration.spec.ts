@@ -18,9 +18,12 @@ import { Invitation } from 'src/invitation/entity/invitation.entity';
 import { RefreshToken } from 'src/auth/entity/auth.entity';
 import { Comment } from 'src/comments/entity/comment.entity';
 import { Tasks } from 'src/task/entity/task.entity';
+import { Attachment } from 'src/attachments/entity/attachment.entity';
+import { Notification } from 'src/notifications/entity/notification.entity';
 
 import { DataSource, Repository } from 'typeorm';
 import { ConflictException } from '@nestjs/common';
+import { FileStorageService } from 'src/common/storage/file-storage.service';
 
 describe('CreateUserService', () => {
   // TestingModule representa el módulo de Nest que construiremos
@@ -148,6 +151,8 @@ describe('CreateUserService', () => {
               RefreshToken,
               Comment,
               Tasks,
+              Attachment,
+              Notification,
             ],
 
             // SOLO para nuestra base de pruebas.
@@ -188,7 +193,7 @@ describe('CreateUserService', () => {
       // Nest se encargará de inyectarle automáticamente
       // Repository<User>.
       //
-      providers: [CreateUserService],
+      providers: [CreateUserService, FileStorageService],
     }).compile();
 
     // ==========================================================
@@ -237,6 +242,10 @@ describe('CreateUserService', () => {
     // necesitemos limpiar nuestra base de pruebas.
     //
     dataSource = module.get(getDataSourceToken());
+  });
+
+  afterAll(async () => {
+    await module.close();
   });
 
   // ============================================================
