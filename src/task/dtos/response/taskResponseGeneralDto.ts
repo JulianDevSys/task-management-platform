@@ -2,6 +2,22 @@ import { ApiProperty } from '@nestjs/swagger';
 import { PriorityTask } from 'src/task/enums/priorityTask.enum';
 import { StatusTask } from 'src/task/enums/statusTask.enum';
 
+export class TaskAttachmentMetadataDto {
+  @ApiProperty({ description: 'ID único del archivo adjunto', example: 'a1b2c3d4-e5f6-7890-abcd-1234567890ef' })
+  id: string;
+
+  @ApiProperty({ description: 'Nombre original del archivo', example: 'reporte.pdf' })
+  originalName: string;
+
+  @ApiProperty({ description: 'Tipo MIME del archivo', example: 'application/pdf' })
+  mimeType: string;
+
+  @ApiProperty({ description: 'Tamaño del archivo en bytes', example: 245678 })
+  size: number;
+
+  @ApiProperty({ description: 'Ruta física del archivo en el almacenamiento actual', example: 'uploads/reporte.pdf' })
+  path: string;
+}
 
 export class TaskResponseGeneralDto {
   @ApiProperty({
@@ -35,7 +51,7 @@ export class TaskResponseGeneralDto {
     example: '2026-09-15T23:59:59Z',
     required: false,
   })
-  dueDate?: Date;
+  dueDate: Date | null;
 
   @ApiProperty({
     description: 'Nombre del miembro asignado a la tarea',
@@ -43,4 +59,11 @@ export class TaskResponseGeneralDto {
     required: false,
   })
   assignedToName?: string;
+
+  @ApiProperty({
+    description: 'Metadatos de archivos adjuntos de la tarea',
+    type: [TaskAttachmentMetadataDto],
+    required: false,
+  })
+  attachments?: TaskAttachmentMetadataDto[];
 }
