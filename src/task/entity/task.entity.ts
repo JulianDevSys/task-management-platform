@@ -1,12 +1,20 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { StatusTask } from "../enums/statusTask.enum";
-import { PriorityTask } from "../enums/priorityTask.enum";
-import { Organization } from "src/organizations/entity/Organization.entity";
-import { MembersOrganization } from "src/memberOrganization/entity/memberOrganization.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { StatusTask } from '../enums/statusTask.enum';
+import { PriorityTask } from '../enums/priorityTask.enum';
+import { Organization } from 'src/organizations/entity/Organization.entity';
+import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
+import { Comment } from 'src/comments/entity/comment.entity';
+import { Attachment } from 'src/attachments/entity/attachment.entity';
 
 @Entity('tasks')
-export class Tasks{
-
+export class Tasks {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -16,39 +24,47 @@ export class Tasks{
   @Column()
   description: string;
 
-  @Column({type: 'enum', enum: StatusTask, default: StatusTask.PENDING})
+  @Column({ type: 'enum', enum: StatusTask, default: StatusTask.PENDING })
   status: StatusTask;
 
-  @Column({type: 'enum', enum: PriorityTask, default: PriorityTask.LOW})
+  @Column({ type: 'enum', enum: PriorityTask, default: PriorityTask.LOW })
   priority: PriorityTask;
 
-  @Column()
-  dueDate: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  dueDate: Date | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   @ManyToOne(() => Organization, (organization) => organization.tasks, {
-  onDelete: 'CASCADE',
-})
-@JoinColumn({ name: 'organizationId' })
-organization: Organization;
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'organizationId' })
+  organization: Organization;
 
-@ManyToOne(() => MembersOrganization, (member) => member.taskAssigned, {
-  onDelete: 'CASCADE',
-  nullable: true,
-})
-@JoinColumn({ name: 'assignedToId' })
-assignedTo: MembersOrganization | null;
+  @ManyToOne(() => MembersOrganization, (member) => member.taskAssigned, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'assignedToId' })
+  assignedTo: MembersOrganization | null;
 
-@ManyToOne(() => MembersOrganization, (member) => member.taskAssignedBy, {
-  onDelete: 'CASCADE',
-})
-@JoinColumn({ name: 'assignedById' })
-assignedBy: MembersOrganization;
+  @ManyToOne(() => MembersOrganization, (member) => member.taskAssignedBy, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'assignedById' })
+  assignedBy: MembersOrganization;
 
+  @OneToMany(() => Comment, (comment) => comment.task)
+  comments: Comment[];
 
+  @OneToMany(() => Attachment, (attachment) => attachment.task)
+  attachments: Attachment[];
 }

@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  IsNotEmpty,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -47,4 +48,15 @@ export class CreateUserDto {
   @IsUrl()
   @MaxLength(500)
   avatarUrl?: string;
+
+  @ApiProperty({
+    example: '12345678',
+    type: String,
+    required: true,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  @MaxLength(500)
+  password: string;
 }

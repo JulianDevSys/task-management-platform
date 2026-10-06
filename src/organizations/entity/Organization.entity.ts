@@ -1,3 +1,4 @@
+import { Invitation } from 'src/invitation/entity/invitation.entity';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
 import { Tasks } from 'src/task/entity/task.entity';
 import { User } from 'src/users/entity/User.entity';
@@ -26,6 +27,12 @@ export class Organization {
   @Column()
   description:string;
 
+  @Column({ name: 'logo_key', type: 'varchar', length: 500, nullable: true })
+  logoKey: string | null;
+
+  @Column({ name: 'logo_mime_type', type: 'varchar', length: 120, nullable: true })
+  logoMimeType: string | null;
+
   @UpdateDateColumn()
   updatedAt: Date;
 
@@ -43,4 +50,7 @@ export class Organization {
 
   @OneToMany(() => Tasks, (task) => task.organization,)
   tasks: Tasks[]; 
+
+  @OneToMany(()=> Invitation,(invitation)=> invitation.organization)
+  invitations: Invitation[]
 }
