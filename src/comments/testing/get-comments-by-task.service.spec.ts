@@ -5,6 +5,7 @@ import { GetCommentsByTaskService } from '../services/get-comments-by-task.servi
 import { Comment } from '../entity/comment.entity';
 import { Tasks } from 'src/task/entity/task.entity';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
+import { RedisService } from 'src/redis/redis.service';
 
 describe('GetCommentsByTaskService', () => {
   let service: GetCommentsByTaskService;
@@ -23,6 +24,13 @@ describe('GetCommentsByTaskService', () => {
         { provide: getRepositoryToken(Comment), useValue: commentRepository },
         { provide: getRepositoryToken(Tasks), useValue: taskRepository },
         { provide: getRepositoryToken(MembersOrganization), useValue: memberRepository },
+        {
+          provide: RedisService,
+          useValue: {
+            get: jest.fn().mockResolvedValue(null),
+            set: jest.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     }).compile();
 

@@ -1,6 +1,7 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { UpdateUserService } from '../services/UpdateUser.service';
 import { UpdateUserDto } from '../Dtos/updateUser.dto';
+import { Not } from 'typeorm';
 
 describe('UpdateUserService', () => {
   let mockUserRepo;
@@ -41,7 +42,7 @@ describe('UpdateUserService', () => {
     const updateUser = {
       id: '123sjae',
       name: 'Julian',
-      email: 'jucastrohenao@gmail.com',
+      email: 'old-email@test.com',
     };
     mockUserRepo.preload.mockResolvedValue(updateUser);
     mockUserRepo.exists.mockResolvedValue(true);
@@ -51,6 +52,7 @@ describe('UpdateUserService', () => {
     expect(mockUserRepo.exists).toHaveBeenCalledWith({
       where: {
         email: dtoUser.email,
+        id: Not('123sjae'),
       },
     });
 
@@ -113,6 +115,7 @@ describe('UpdateUserService', () => {
     expect(mockUserRepo.exists).toHaveBeenCalledWith({
       where: {
         email: updateDto.email,
+        id: Not('123sjae'),
       },
     });
 
