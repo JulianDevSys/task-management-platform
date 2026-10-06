@@ -22,6 +22,7 @@ describe('CreateUserService', () => {
       id: 1,
       name: 'Julian',
       email: 'julian@test.com',
+      password: '123456'
     };
 
     mockRepositoryUser.create.mockReturnValue(user);
@@ -30,6 +31,7 @@ describe('CreateUserService', () => {
     const result = await service.createUser({
       name: 'Julian',
       email: 'julian@test.com',
+      password: '123456',
     });
 
     expect(result).toEqual(user);
@@ -42,6 +44,7 @@ describe('CreateUserService', () => {
       service.createUser({
         name: 'Julian',
         email: 'julian@test.com',
+        password: '123456',
       })
     ).rejects.toThrow(ConflictException);
 
@@ -75,6 +78,7 @@ describe('CreateUserService', () => {
       service.createUser({
         name: 'Julian',
         email: 'julian@test.com',
+        password: '123456',
       })
     ).rejects.toThrow('Database error');
     expect(mockRepositoryUser.save).toHaveBeenCalledWith(user);
