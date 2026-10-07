@@ -11,6 +11,7 @@ import { Tasks } from 'src/task/entity/task.entity';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentResponseDto } from '../response/comment.response';
+import { RedisService } from 'src/redis/redis.service';
 
 
 @Injectable()
@@ -22,6 +23,7 @@ export class CreateCommentService {
     private readonly taskRepository: Repository<Tasks>,
     @InjectRepository(MembersOrganization)
     private readonly memberOrganizationRepository: Repository<MembersOrganization>,
+    private readonly redisService: RedisService
   ) {}
 
   private normalizeContent(content: string): string {
@@ -67,6 +69,9 @@ export class CreateCommentService {
     });
 
     const savedComment = await this.commentRepository.save(comment);
+     const cacheKey = `comments:task:${task.id}`;
+
+    await this.redisService.delete(cacheKey);
     const created = await this.commentRepository.findOne({
       where: { id: savedComment.id },
       relations: { user: true, task: true },

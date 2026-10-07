@@ -4,6 +4,8 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { CreateCommentService } from '../services/create-comment.service';
 import { CommentResponseDto } from '../response/comment.response.dto';
 import { CreateCommentDto } from '../dto/create-comment.dto';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { JwtUser } from 'src/auth/interfaces/jwt-user.interface';
 
 
 @ApiTags('Comments')
@@ -16,8 +18,8 @@ export class CreateCommentController {
   @Post()
   @ApiOperation({ summary: 'Create a comment on a task' })
   @ApiResponse({ status: 201, type: CommentResponseDto })
-  async createComment(@Body() createCommentDto: CreateCommentDto, @Req() req: any) {
-    const comment = await this.createCommentService.createComment(createCommentDto, req.user);
+  async createComment(@Body() createCommentDto: CreateCommentDto,  @CurrentUser() user: JwtUser,) {
+    const comment = await this.createCommentService.createComment(createCommentDto, user);
     return {
       message: 'Comment created successfully',
       data: comment,
