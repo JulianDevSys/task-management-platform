@@ -6,6 +6,8 @@ import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganiz
 import { InvitationStatus } from '../enums/invitationStatus.enum';
 import { MemberRole } from 'src/memberOrganization/enum/memberRole.enum';
 import { AcceptJoinRequestResponseDto } from '../Dtos/response/acceptJoinRequestResponse.dto';
+import { CreateNotificationService } from 'src/notifications/services/createNotification.service';
+import { NotificationType } from 'src/notifications/enums/notification-type.enum';
 
 @Injectable()
 export class AcceptJoinRequestService {
@@ -14,7 +16,8 @@ export class AcceptJoinRequestService {
     private readonly invitationRepo: Repository<Invitation>,
     @InjectRepository(MembersOrganization)
     private readonly memberRepo: Repository<MembersOrganization>,
-    private readonly dataSource: DataSource
+    private readonly dataSource: DataSource,
+    private readonly createNotificationService: CreateNotificationService,
   ) {}
 
   async acceptJoinRequest(
@@ -28,7 +31,7 @@ export class AcceptJoinRequestService {
         receiverUser: { id: receiverUserId },
         status: InvitationStatus.REQUESTED,
       },
-      relations: { receiverUser: true },
+      relations: { receiverUser: true, organization: true },
     });
 
     if (!invitation) {
@@ -51,12 +54,10 @@ export class AcceptJoinRequestService {
       throw new ConflictException('adminUserId is required');
     }
 
-   
-
     const verifyAdmin = await this.memberRepo.findOne({
       where: {
         organization: { id: organizationId },
-        userMember: {id:admindId},
+        userMember: { id: admindId },
         role: MemberRole.ADMIN,
       },
     });
@@ -79,6 +80,15 @@ export class AcceptJoinRequestService {
       invitation.status = InvitationStatus.ACCEPTED;
       invitation['acceptedAt'] = new Date();
       await queryRunner.manager.save(invitation);
+
+      await this.createNotificationService.createNotification(
+        {
+          userId: receiverUserId,
+          type: NotificationType.JOIN_REQUEST_ACCEPTED,
+          message: `Tu solicitud para unirte a la organización "${invitation.organization?.name ?? 'la organización'}" fue aceptada.`,
+        },
+        queryRunner.manager,
+      );
 
       await queryRunner.commitTransaction();
       return {

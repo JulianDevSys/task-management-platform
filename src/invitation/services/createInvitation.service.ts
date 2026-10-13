@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Invitation } from '../entity/invitation.entity';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
 import { Organization } from 'src/organizations/entity/Organization.entity';
 import { User } from 'src/users/entity/User.entity';
@@ -15,6 +15,8 @@ import { MemberRole } from 'src/memberOrganization/enum/memberRole.enum';
 import { InvitationStatus } from '../enums/invitationStatus.enum';
 import { InvitationResponseDto } from '../Dtos/response/InvitationResponse.dto';
 import { ConfigService } from '@nestjs/config';
+import { CreateNotificationService } from 'src/notifications/services/createNotification.service';
+import { NotificationType } from 'src/notifications/enums/notification-type.enum';
 
 @Injectable()
 export class CreateInvitationService {
@@ -29,6 +31,8 @@ export class CreateInvitationService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     private readonly configService: ConfigService,
+    private readonly dataSource: DataSource,
+    private readonly createNotificationService: CreateNotificationService,
   ) {}
 
   async createInvitation(
@@ -100,19 +104,42 @@ expiresAt.setDate(expiresAt.getDate() + expirationDays);
     expiresAt,
   });
 
-  const savedInvitation = await this.invitationRepo.save(invitation);
+  const queryRunner = this.dataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
 
-  return {
-    id: savedInvitation.id,
-    organizationId: organization.id,
-    organizationName: organization.name,
-    receiverUserId: receiverUser.id,
-    receiverUserName: receiverUser.name,
-    senderMemberId: senderUserId,       
-    senderMemberName: verifyAdmin.userMember.name, 
-    status: savedInvitation.status,
-    createdAt: savedInvitation.createdAt,
-    expiresAt: savedInvitation.expiresAt,
-  } as InvitationResponseDto;
+  try {
+    const invitationRepo = queryRunner.manager.getRepository(Invitation);
+    const savedInvitation = await invitationRepo.save(invitation);
+
+    await this.createNotificationService.createNotification(
+      {
+        userId: receiverUser.id,
+        type: NotificationType.INVITATION_RECEIVED,
+        message: `Has recibido una invitación para unirte a la organización "${organization.name}".`,
+      },
+      queryRunner.manager,
+    );
+
+    await queryRunner.commitTransaction();
+
+    return {
+      id: savedInvitation.id,
+      organizationId: organization.id,
+      organizationName: organization.name,
+      receiverUserId: receiverUser.id,
+      receiverUserName: receiverUser.name,
+      senderMemberId: senderUserId,
+      senderMemberName: verifyAdmin.userMember.name,
+      status: savedInvitation.status,
+      createdAt: savedInvitation.createdAt,
+      expiresAt: savedInvitation.expiresAt,
+    } as InvitationResponseDto;
+  } catch (error) {
+    await queryRunner.rollbackTransaction();
+    throw error;
+  } finally {
+    await queryRunner.release();
+  }
 }
 }
