@@ -3,13 +3,16 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
+import { In, DataSource, Repository } from 'typeorm';
 import { Invitation } from '../entity/invitation.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Organization } from 'src/organizations/entity/Organization.entity';
 import { User } from 'src/users/entity/User.entity';
 import { MembersOrganization } from 'src/memberOrganization/entity/memberOrganization.entity';
 import { InvitationStatus } from '../enums/invitationStatus.enum';
+import { CreateNotificationService } from 'src/notifications/services/createNotification.service';
+import { NotificationType } from 'src/notifications/enums/notification-type.enum';
+import { MemberRole } from 'src/memberOrganization/enum/memberRole.enum';
 
 @Injectable()
 export class CreateJoinRequestService {
@@ -21,7 +24,9 @@ export class CreateJoinRequestService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     @InjectRepository(MembersOrganization)
-    private readonly memberRepo: Repository<MembersOrganization>
+    private readonly memberRepo: Repository<MembersOrganization>,
+    private readonly dataSource: DataSource,
+    private readonly createNotificationService: CreateNotificationService,
   ) {}
 
   async createJoinRequest(organizationId: string, userId: string) {
@@ -69,16 +74,48 @@ export class CreateJoinRequestService {
       createdAt: new Date(),
     });
 
-    const savedRequest = await this.invitationRepo.save(joinRequest);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    return {
-      id: savedRequest.id,
-      organizationId: organization.id,
-      organizationName: organization.name,
-      requestedByUserId: user.id,
-      requestedByUserName: user.name,
-      status: savedRequest.status,
-      createdAt: savedRequest.createdAt,
-    };
+    try {
+      const savedRequest = await queryRunner.manager.getRepository(Invitation).save(joinRequest);
+
+      const admins = await queryRunner.manager.getRepository(MembersOrganization).find({
+        where: {
+          organization: { id: organizationId },
+          role: MemberRole.ADMIN,
+        },
+        relations: { userMember: true },
+      });
+
+      for (const admin of admins) {
+        await this.createNotificationService.createNotification(
+          {
+            userId: admin.userMember.id,
+            type: NotificationType.JOIN_REQUEST_RECEIVED,
+            message: `${user.name} ha solicitado unirse a la organización "${organization.name}".`,
+          },
+          queryRunner.manager,
+        );
+      }
+
+      await queryRunner.commitTransaction();
+
+      return {
+        id: savedRequest.id,
+        organizationId: organization.id,
+        organizationName: organization.name,
+        requestedByUserId: user.id,
+        requestedByUserName: user.name,
+        status: savedRequest.status,
+        createdAt: savedRequest.createdAt,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

@@ -2,12 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { TransformResponseInterceptor } from './common/interceptors/TrasnformResponse.interceptor';
 
 async function bootstrap() {
-  console.time('nest startup');
   const app = await NestFactory.create(AppModule);
 
-  console.timeEnd('nest startup');
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -15,6 +14,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+   app.useGlobalInterceptors(new TransformResponseInterceptor());
 
   const config = new DocumentBuilder()
     .setTitle('Task Manager API')

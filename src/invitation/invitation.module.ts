@@ -24,6 +24,7 @@ import { CreateJoinRequestService } from './services/createJoinRequest.service';
 import { AcceptJoinRequestService } from './services/aceptJoinRequest.service';
 import { advancedInvitationsQueryController } from './controllers/advancedInvitationsQuery.controller';
 import { AdvancedInvitationsQueryService } from './services/advancedInvitationsQuery.service';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AdvancedInvitationsQueryService } from './services/advancedInvitationsQ
       MembersOrganization,
       Organization,
     ]),
+    NotificationsModule,
   ],
   controllers: [
     CreateInvitationController,
