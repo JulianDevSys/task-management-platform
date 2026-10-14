@@ -13,10 +13,12 @@ import { UpdateTaskController } from "./controllers/updateTask.controller";
 import { GetTaskByIdService } from "./services/getTaskById.service";
 import { DeleteTaskService } from "./services/deleteTask.service";
 import { UpdateTaskService } from "./services/updateTask.service";
+import { NotificationsModule } from "src/notifications/notifications.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Organization, MembersOrganization,Tasks])],
+  imports: [TypeOrmModule.forFeature([Organization, MembersOrganization, Tasks]), NotificationsModule],
   controllers: [CreateTaskController, GetTaskController, GetTaskByIdController, DeleteTaskController, UpdateTaskController],
-  providers: [CreateTaskService, GetTaskService, GetTaskByIdService, DeleteTaskService,UpdateTaskService],
+  providers: [CreateTaskService, GetTaskService, GetTaskByIdService, DeleteTaskService, UpdateTaskService],
+  exports: [CreateTaskService],
 })
 export class TaskModule {}

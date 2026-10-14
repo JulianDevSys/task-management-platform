@@ -34,7 +34,4 @@ export class MembersOrganization {
 
   @OneToMany(() => Tasks, (task) => task.assignedBy)
   taskAssignedBy: Tasks[];
-
-/*   @OneToMany(()=>Invitation, (invitation)=> invitation.sendInvitation)
-  sendInvitation: Invitation[] */
 }
